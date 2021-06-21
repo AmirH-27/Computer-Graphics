@@ -1,0 +1,73 @@
+// DDA algorithm
+#include <windows.h>
+#include <GL/glut.h>
+#include <iostream>
+using namespace std;
+void display(){
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLineWidth(5.0);
+    glBegin(GL_LINES);
+    glColor3ub(1, 1, 1);
+    glVertex2f(-6.0f, 0.0f);
+    glVertex2f(6.0f, 0.0f );
+    glVertex2f(0.0f, 6.0f);
+    glVertex2f(0.0f, -6.00f );
+    glEnd();
+}
+
+void dda() {
+    display();
+    float x1, y1, x0, y0;
+    int steps,i=0;
+    float x, y;
+    float dy;
+    float dx;
+    cout<<"Enter the values of X0: ";
+    cin>>x0;
+    cout<<"Enter the values of y0: ";
+    cin>>y0;
+    cout<<"Enter the values of x1: ";
+    cin>>x1;
+    cout<<"Enter the values of y1: ";
+    cin>>y1;
+    dy = y1-y0;
+    dx = x1-x0;
+    x=x0, y=y0;
+
+    if(dx>dy){
+        steps = dx;
+    }
+    else{
+        steps = dy;
+    }
+    float xIncrease = dx/steps;
+    float yIncrease = dy/steps;
+
+    while(i!=steps){
+ 	cout<<"Coordinates: ("<<x<<", "<<y<<")"<<endl;
+        glBegin(GL_LINES);
+        glColor3ub(1, 1, 1);
+        glVertex2f(x, y);
+        glVertex2f(x1, y1);
+        x += xIncrease;
+        y += yIncrease;
+        x0 = x;
+        y0 = y;
+        i++;
+    }
+    glEnd();
+
+    glFlush();
+}
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutCreateWindow("DDA");
+    glutInitWindowSize(320, 320);
+    gluOrtho2D(-6,6,-6,6);
+    glutDisplayFunc(dda);
+    glutMainLoop();
+    return 0;
+}
+
+
