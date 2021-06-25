@@ -1,0 +1,105 @@
+//MidPoint Circle Algorithm
+#include <windows.h>
+#include <GL/glut.h>
+#include <iostream>
+using namespace std;
+void midPoint(int x0, int y0, int x1, int y1){
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    if(dy<=dx){
+        int d = dy - (dx/2);
+        int x = x0, y = y0;
+        glPointSize(5);
+        glBegin(GL_POINTS);
+        glColor3ub(1, 1, 1);
+        glVertex2f(x, y);
+        glVertex2f(x1, y1);
+        glEnd();
+        cout << x << "," << y << "\n";
+
+        // iterate through value of X
+        while (x < x1)
+        {
+            glPointSize(5);
+            glBegin(GL_POINTS);
+            glColor3ub(1, 1, 1);
+            glVertex2f(x, y);
+            glVertex2f(x1, y1);
+            x++;
+            if (d < 0){
+                d = d + dy;
+            }
+            else
+            {
+                d += (dy - dx);
+                y++;
+            }
+            cout << x << "," << y << "\n";
+        }
+        glEnd();
+    }
+
+    else if(dx<dy)
+    {
+        int d = dx - (dy/2);
+        int x = x0, y = y0;
+        cout << x << "," << y << "\n";
+        glPointSize(5);
+        glBegin(GL_POINTS);
+        glColor3ub(1, 1, 1);
+        glVertex2f(x, y);
+        glVertex2f(x1, y1);
+        while (y < y1)
+        {
+            glBegin(GL_POINTS);
+            glColor3ub(1, 1, 1);
+            glVertex2f(x, y);
+            glVertex2f(x1, y1);
+            y++;
+            if (d < 0){
+                d = d + dx;
+            }
+            else
+            {
+                d += (dx - dy);
+                x++;
+            }
+            cout << x << "," << y << "\n";
+        }
+        glEnd();
+    }
+    glFlush();
+}
+void display(){
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glLineWidth(5.0);
+    glBegin(GL_LINES);//axis
+    glColor3ub(1, 1, 1);
+    glVertex2f(-6.0f, 0.0f);
+    glVertex2f(6.0f, 0.0f );
+    glVertex2f(0.0f, 6.0f);
+    glVertex2f(0.0f, -6.00f );
+    glEnd();
+    int x0, y0, x1, y1;
+    cout<<"Enter the Value of x0: ";
+    cin>>x0;
+    cout<<"Enter the Value of y0: ";
+    cin>>y0;
+    cout<<"Enter the Value of x1: ";
+    cin>>x1;
+    cout<<"Enter the Value of y1: ";
+    cin>>y1;
+    midPoint(x0, y0, x1, y1);//calling the function to calculate the midpoint algo
+
+}
+
+int main(int argc, char** argv){
+    glutInit(&argc, argv);
+    glutCreateWindow("Mid Point Algorithm");//window name
+    glutInitWindowSize(1320, 1320);
+    gluOrtho2D(-6,6,-6,6);
+    glutDisplayFunc(display);//calling the display function
+    glutMainLoop();
+    return 0;
+}
