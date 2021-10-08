@@ -1,0 +1,2242 @@
+#include<cstdio>
+#include <GL/gl.h>
+#include <math.h>
+#include <GL/glut.h>
+#include<stdlib.h>
+#include<iostream>
+using namespace std;
+//train position
+GLfloat position = 50.0f;
+GLfloat position1 = -95.0f;
+GLfloat position2 = 50.0f;
+GLfloat position3 = -95.0f;
+
+void dis();
+void display();
+float _moveDucks = 0;
+float _moveCartx = 0;
+float _moveCarty = 0;
+//car position
+GLfloat positionc = 33.0f;
+GLfloat positionc1 = 90.0f;
+GLfloat positionc2 = -33.0f;
+GLfloat positionc3 = -90.0f;
+
+//for rain
+float _rain = 0.0;
+bool rainday = false;
+
+
+//parameterised functions for specific objects
+void drawQuad(GLint x0, GLint y0, GLint x1, GLint y1, GLint x2, GLint y2, GLint x3, GLint y3)
+{
+    glBegin(GL_QUADS);
+    glVertex2f(x0,y0);
+    glVertex2f(x1,y1);
+    glVertex2f(x2,y2);
+    glVertex2f(x3,y3);
+    glEnd();
+}
+void drawTriangle(GLint x0, GLint y0, GLint x1, GLint y1, GLint x2, GLint y2)
+{
+    glBegin(GL_TRIANGLES);
+    glVertex2f(x0,y0);
+    glVertex2f(x1,y1);
+    glVertex2f(x2,y2);
+    glEnd();
+}
+
+void drawLine(GLint x0, GLint y0, GLint x1, GLint y1)
+{
+    glLineWidth(5);
+    glBegin(GL_LINES);
+    glVertex2f(x0,y0);
+    glVertex2f(x1,y1);
+    glEnd();
+}
+
+void DrawCircle(float cx, float cy, float r)
+{
+    glBegin(GL_POLYGON);
+    for (int i = 0; i < 200; i++)
+    {
+        float theta = 2.0f * 3.1415926f * float(i) / float(200);//get current angle
+        float x = cx+ r * cosf(theta);//calculate x
+        float y = cy + r * sinf(theta);//calculate y
+        glVertex2f(x, y);//output vertex
+    }
+    glEnd();
+    glFlush();
+}
+
+void drawLines(GLint x0, GLint y0, GLint x1, GLint y1,GLint w)
+{
+    glLineWidth(w);
+    glBegin(GL_LINES);
+    glVertex2f(x0,y0);
+    glVertex2f(x1,y1);
+    glEnd();
+}
+
+void updateDuck(int value) {
+
+
+
+ _moveDucks -= 1;
+if(_moveDucks < -9)
+{
+_moveDucks = 100;
+}
+glutPostRedisplay();
+glutTimerFunc(100, updateDuck, 0);
+}
+
+
+void updateCart(int value) {
+ _moveCartx += 1;
+if(_moveCartx > 100)
+{
+_moveCartx = 0;
+}
+
+ _moveCarty += 2;
+if(_moveCarty > 100)
+{
+_moveCarty = 0;
+}
+glutPostRedisplay();
+glutTimerFunc(100, updateCart, 0);
+}
+
+void update(int value) {
+    if(position <-140){
+        position = 50;
+        position1 = -95;
+    }
+    position-= 1.5;
+    position1+= 2.8;
+    glutPostRedisplay();
+    glutTimerFunc(100,update,0);
+}
+
+void update1(int value) {
+    if(position2 <-140){
+        position2 = 50;
+        position3 = -95;
+    }
+    position2-= 1.5;
+    position3+= 2.8;
+    glutPostRedisplay();
+    glutTimerFunc(100,update1,0);
+}
+
+void updateCar(int value) {
+    if(positionc1 <-180){
+        positionc = 33;
+        positionc1 = 90;
+    }
+    positionc-= 1.3;
+    positionc1-= 4;
+    glutPostRedisplay();
+    glutTimerFunc(100,updateCar,0);
+}
+
+void updateCar1(int value) {
+    if(positionc3 > 180){
+        positionc2 = -33;
+        positionc3 = -90;
+    }
+    positionc2+= 1.5;
+    positionc3+= 4;
+    glutPostRedisplay();
+    glutTimerFunc(100,updateCar1,0);
+}
+
+void init() {
+    glClearColor(0.0f,0.5f,0.7f,1.0f);
+    //glLoadIdentity();
+    gluOrtho2D(-100,100,-100,100);
+}
+//rain day
+
+void Rain(int value){
+
+if(rainday){
+
+    _rain += 0.01f;
+
+    glBegin(GL_POINTS);
+    for(int i=1;i<=100;i++)
+    {
+        int x=rand(),y=rand();
+        x%=1200; y%=100;
+        glBegin(GL_LINES);
+        glColor3f(1.0, 1.0, 1.0);
+        glVertex2d(x,y);
+        glVertex2d(x+5,y+5);
+        glEnd();
+    }
+    for(int i=1;i<=100;i++)
+    {
+        int x=rand(),y=rand();
+        x%=1200; y%=100;
+        glBegin(GL_LINES);
+        glColor3f(1.0, 1.0, 1.0);
+        glVertex2d(-x,-y);
+        glVertex2d(-x+5,-y+5);
+        glEnd();
+    }
+    for(int i=1;i<=100;i++)
+    {
+        int x=rand(),y=rand();
+        x%=1200; y%=100;
+        glBegin(GL_LINES);
+        glColor3f(1.0, 1.0, 1.0);
+        glVertex2d(-x,y);
+        glVertex2d(-x+5,y+5);
+        glEnd();
+    }
+    for(int i=1;i<=100;i++)
+    {
+        int x=rand(),y=rand();
+        x%=1200; y%=100;
+        glBegin(GL_LINES);
+        glColor3f(1.0, 1.0, 1.0);
+        glVertex2d(x,-y);
+        glVertex2d(x+5,-y+5);
+        glEnd();
+    }
+
+
+	//glutPostRedisplay();
+	glutTimerFunc(5, Rain, 0);
+
+    glFlush();
+
+}
+}
+
+//RAY street lamps
+void Ray(){
+//Lamp post 1 ray
+    glBegin(GL_POLYGON);
+glColor3ub(244, 244, 33);
+
+glVertex2f(-15,47);
+glColor3ub(70, 70, 55);
+glVertex2f(-18,20);
+
+glVertex2f(-8,20);
+glColor3ub(244, 244, 33);
+glVertex2f(-12.5,47);
+glEnd();
+//Lamp post 2 ray
+glBegin(GL_POLYGON);
+glColor3ub(244, 244, 33);
+
+glVertex2f(-6,67);
+glColor3ub(70, 70, 55);
+glVertex2f(-9,40);
+
+glVertex2f(1,40);
+glColor3ub(244, 244, 33);
+glVertex2f(-3.5,67);
+glEnd();
+
+//Lamp post 3 ray
+glBegin(GL_POLYGON);
+glColor3ub(244, 244, 33);
+
+glVertex2f(3,87);
+glColor3ub(70, 70, 55);
+glVertex2f(0,60);
+
+glVertex2f(10,60);
+glColor3ub(244, 244, 33);
+glVertex2f(5.5,87);
+glEnd();
+
+//Lamp post 4 ray
+glBegin(GL_POLYGON);
+glColor3ub(244, 244, 33);
+
+glVertex2f(13,105);
+glColor3ub(70, 70, 55);
+glVertex2f(10,80);
+
+glVertex2f(19,80);
+glColor3ub(244, 244, 33);
+glVertex2f(15,105);
+glEnd();
+
+}
+
+void shops(){
+    glColor3ub(105,116,152);
+    drawQuad(20,103,0,60,0,85,20,125);
+    glColor3ub(105,116,152);
+    drawLines(20,125,0,85,4);
+    glColor3ub(0,0,0);
+    drawLines(0,60,0,85,3);
+    glColor3ub(168,186,226);
+    drawTriangle(0,85,20,125,-18,100);
+
+    //windows
+    glColor3ub(78,138,162);
+    drawQuad(2,68,6,77,6,92,2,83);
+    glColor3ub(187,194,249);
+    drawLines(2,68,6,77,4);
+    drawLines(6,77,6,92,4);
+
+     glColor3ub(78,138,162);
+    drawQuad(8,81,12,90,12,105,8,96);
+    glColor3ub(187,194,249);
+    drawLines(8,81,12,90,4);
+    drawLines(12,90,12,105,4);
+}
+
+void building6(){
+   //pillar
+    glColor3ub(200,202,201);
+    drawQuad(-85,-80,-81,-82,-81,-51,-85,-51);
+    glColor3ub(101,105,104);
+    drawQuad(-81,-82,-79,-80,-79,-51,-81,-51);
+
+    //roof
+    glColor3ub(167,156,156);
+    drawTriangle(-100,-85,-76,-50,-100,-38);
+    glColor3ub(104,104,104);
+    drawTriangle(-100,-82,-79,-51,-100,-41);
+    glColor3ub(96,5,4);
+    drawQuad(-100,-88,-76,-53,-76,-50,-100,-85);
+    glColor3ub(119,235,235);
+    drawQuad(-81,-60,-81,-82,-92,-100,-100,-88);
+    glColor3ub(119,235,235);
+    drawTriangle(-92,-100,-100,-88,-100,-100);
+
+    glColor3ub(25,17,11);
+    drawLines(-81,-82,-92,-100,6);
+    glColor3ub(75,148,195);
+    drawTriangle(-81,-68,-81,-82,-85,-89);
+    glColor3ub(25,17,11);
+    drawLines(-85,-89,-85,-75,2);
+    drawLines(-81,-68,-85,-75,2);
+
+
+}
+
+//buildings
+void building1(){
+    glColor3ub(100,38,15);
+    drawQuad(-20,17,0,60,0,95,-20,65);
+    glColor3ub(177,80,37);
+
+    drawQuad(-20,65,-40,72,-40,25,-20,17);
+    glColor3ub(148,134,115);
+    drawQuad(-20,65,0,95,-19,100,-40,72);
+    //Roof
+    glColor3ub(183,160,154);
+    drawQuad(-20,68,-3,94,-18,98,-37,73);
+
+    //window
+    glColor3ub(78,138,162);
+    drawTriangle(-40,50,-30,46,-30,69);
+    glColor3ub(150,210,234);
+    drawTriangle(-40,50,-30,69,-40,72);
+    //door
+    glColor3ub(112,74,29);
+    drawQuad(-26,37,-34,40,-34,23,-26,20);
+    //door-white part
+    glColor3ub(255,255,255);
+    drawQuad(-28,36,-32,38,-32,33,-28,31);
+    //door-glass
+    glColor3ub(150,210,234);
+    drawQuad(-27.5,29,-33,32,-33,22,-27.5,19.9);
+    glColor3ub(78,138,162);
+    drawLines(-27.5,29,-33,32,1);
+    drawLines(-33,32,-33,22,1);
+    drawLines(-33,22,-27.5,19.9,1);
+    drawLines(-27.5,29,-27.5,19.9,1);
+    drawLines(-30,31,-30,20,1);
+    glColor3ub(78,138,162);
+    drawTriangle(-27.5,29,-30,20,-27.5,19.9);
+//border
+    glColor3ub(177,80,37);
+    drawLines(-20,65,0,95,4);
+    drawLines(0,95,-19,100,4);
+    drawLines(-19,100,-40,72,4);
+    drawLines(-20,65,-40,72,4);
+
+    //extra windows
+
+    //window
+    glColor3ub(78,138,162);
+    drawQuad(-39,30,-35,28,-35,42,-39,44);
+
+    glColor3ub(150,210,234);
+    drawTriangle(-39,30,-35,42,-39,44);
+    glColor3ub(159,142,126);
+    drawLines(-39,30,-35,28,2);
+    drawLines(-35,28,-35,42,2);
+    drawLines(-35,42,-39,44,2);
+    drawLines(-39,30,-39,44,2);
+
+    glColor3ub(78,138,162);
+    drawQuad(-25,24,-21,22,-21,36,-25,38);
+
+    glColor3ub(150,210,234);
+    drawTriangle(-25,24,-21,36,-25,38);
+
+  //front side windows
+    glColor3ub(78,138,162);
+    drawQuad(-17,64,-13,70,-13,39,-17,31);
+
+    glColor3ub(177,80,37);
+    drawLines(-13,70,-13,39,4);
+    drawLines(-13,39,-17,31,4);
+
+
+    glColor3ub(78,138,162);
+    drawQuad(-11,74,-7,80,-7,52,-11,43);
+
+    glColor3ub(177,80,37);
+    drawLines(-7,80,-7,52,4);
+    drawLines(-7,52,-11,43,4);
+
+    glColor3ub(78,138,162);
+    drawQuad(-5,82,-1,88,-1,63,-5,55);
+
+    glColor3ub(177,80,37);
+    drawLines(-1,88,-1,63,4);
+    drawLines(-1,63,-5,55,4);
+
+    //Plus Sign
+    glColor3ub(255,255,255);
+    drawQuad(-26,49,-24,48,-24,62,-26,63);
+    drawQuad(-29,56,-21,52,-21,56,-29,60);
+}
+
+void building2(){
+    glColor3ub(145,180,175);
+    drawQuad( -50,60,-50,30,-40,40,-40,70);
+
+    glColor3ub(36,101,83);
+    drawQuad(-40,55,-40,25,-50,30,-50,60);
+
+    //windows
+    glColor3ub(97,194,227);
+    drawQuad(-48,47,-46,46,-46,52,-48,53);
+
+    glColor3ub(41,130,110);
+    drawLines(-48,47,-46,46,3);
+
+    glColor3ub(97,194,227);
+    drawQuad(-48,34,-46,33,-46,39,-48,40);
+
+    glColor3ub(41,130,110);
+    drawLines(-48,34,-46,33,3);
+
+    glColor3ub(97,194,227);
+    drawQuad(-44,45,-42,44,-42,50,-44,51);
+
+    glColor3ub(41,130,110);
+    drawLines(-44,45,-42,44,3);
+    //door
+    glColor3ub(74,79,135);
+    drawQuad(-44,27,-42,26,-42,36,-44,37);
+}
+
+void building3(){
+    //back side
+    glColor3ub(252,130,37);
+    drawQuad( -50, 80, -50, 30, -40, 40, -40, 90);
+    //front side
+    glColor3ub(254,212,153);
+    drawQuad(-50,80,-50,30,-60,35,-60,65);
+
+    //window
+    glColor3ub(154,202,232);
+    drawQuad(-60,65,-50,60,-50,80,-60,65);
+    glColor3ub(252,130,37);
+
+    drawLines(-50,80,-60,65,2);
+    drawLines(-50,60,-60,65,2);
+
+    //window
+    glColor3ub(97,194,227);
+    drawQuad(-58,52,-56,51,-56,57,-58,58);
+    glColor3ub(252,130,37);
+
+    drawLines(-58,52,-56,51,2);
+    glColor3ub(97,194,227);
+    drawQuad(-54,50,-52,49,-52,55,-54,56);
+    glColor3ub(252,130,37);
+
+    drawLines(-54,50,-52,49,2);
+    //door
+    glColor3ub(152,116,85);
+    drawQuad(-56,33,-54,32,-54,39,-56,40);
+
+}
+
+void building4(){
+    glColor3ub(206,219,221);
+    drawQuad(-60,55,-60,35,-70,40,-70,60);
+    //borders
+    glColor3ub(131,157,168);
+    drawLines(-60,55,-60,35,3);
+    drawLines(-70,40,-70,60,3);
+    drawLines(-60,55,-70,60,3);
+    glColor3ub(0,0,255);
+    drawQuad(-60, 55, -60, 35, -50, 40, -50, 60);
+    glColor3ub(131,157,168);
+    drawQuad( -70, 60, -60, 55, -50, 60, -60, 65);
+    //door
+    glColor3ub(152,116,85);
+    drawQuad(-68,39,-66,38,-66,45,-68,46);
+
+    //window
+    glColor3ub(97,194,227);
+    drawQuad(-64,45,-62,44,-62,54,-64,55);
+    glColor3ub(78,104,119);
+    drawLines(-63,44,-63,55,1);
+    drawLines(-64,50,-62,49,1);
+
+    drawLines(-64,45,-62,44,1);
+    drawLines(-62,44,-62,54,1);
+    drawLines(-62,54,-64,55,1);
+    drawLines(-64,45,-64,55,1);
+
+
+
+}
+void Btrees(){
+    glColor3ub(111,50,40);
+    drawQuad(-95,55,-94,54,-94,77,-95,78);
+
+    glColor3ub(111,70,10);
+    drawQuad(-98,55,-97,54,-97,77,-98,78);
+
+    glColor3ub(111,90,10);
+    drawQuad(-93,55,-92,54,-92,77,-93,78);
+
+    glColor3ub(79,182,77);
+    drawTriangle(-93,88,-97,77,-88,75);
+
+     glColor3ub(136,172,88);
+    drawTriangle(-93,82,-96,72,-89,68);
+
+    glColor3ub(79,182,77);
+    drawTriangle(-93,75,-96,64,-89,63);
+
+    glColor3ub(136,172,88);
+    drawTriangle(-97,92,-102,81,-93,79);
+
+    glColor3ub(79,182,77);
+    drawTriangle(-97,87,-102,70,-93,68);
+
+    glColor3ub(136,172,88);
+    drawTriangle(-97,77,-100,64,-94,62);
+
+
+}
+void building5(){
+    //Big building 2 Front side
+    glColor3ub(239,204,166);
+    drawQuad( -70, 90, -70, 40, -90, 50, -90, 100);
+    //Back side
+    glColor3ub(163,117,102);
+    drawQuad(-70, 90, -70, 40, -50, 50, -50, 100);
+    //roof
+    glColor3ub(188,177,175);
+    drawQuad(-70, 90,-50,100,-70,120,-90,100);
+    glColor3ub(163,117,102);
+    drawLines(-70, 90,-50,100,3);
+    drawLines(-70, 90,-90,100,3);
+
+    //window
+    glColor3ub(92,153,182);
+    drawQuad(-90,90,-70,80,-70,90,-90,100);
+
+    glColor3ub(128,202,239);
+    drawQuad(-90,80,-70,70,-70,80,-90,90);
+
+    glColor3ub(92,153,182);
+    drawQuad(-90,70,-70,60,-70,70,-90,80);
+    glColor3ub(163,117,102);
+    drawLines(-90,100,-90,60,2);
+    drawLines(-70,90,-70,50,2);
+    glColor3ub(128,202,239);
+    drawQuad(-90,60,-70,50,-70,60,-90,70);
+
+
+    //Door
+    glColor3ub(118,108,91);
+    drawQuad(-82,46,-78,44,-78,54,-82,56);
+    glColor3ub(0,0,0);
+    drawLines(-82,46,-78,44,1);
+    drawLines(-78,44,-78,54,1);
+    drawLines(-78,54,-82,56,1);
+    drawLines(-82,46,-82,56,1);
+
+
+
+}
+
+//Lamp Post
+void LampPost(){
+    //Lamp post 1
+    glColor3ub(197, 202, 202);
+    drawQuad(-18,20,-17.5,20,-17.5,45,-18,45);
+    glColor3ub(181, 184, 184);
+    drawQuad(-18,45,-17.5,45,-16.5,47,-16,49);
+    glColor3ub(197, 202, 202);
+    drawQuad(-16,49,-16.5,47,-12,47,-12,49);
+
+
+    //Lamp Post 2
+    drawQuad(-9.5,40,-8,40,-8,65,-9.5,65);
+    glColor3ub(181, 184, 184);
+    drawQuad(-9.5,65,-8,65,-7,67,-7.5,69);
+    glColor3ub(197, 202, 202);
+    drawQuad(-7.5,69,-7,67,-3.5,67,-3,69);
+
+
+    //Lamp Post 3
+    drawQuad(0.5,60,1.5,60,1.5,85,0.5,85);
+    glColor3ub(181, 184, 184);
+    drawQuad(0.5,85,1.5,85,2,87,2,89);
+    glColor3ub(197, 202, 202);
+    drawQuad(2,89,2,87,6,87,6,89);
+
+
+    //Lamp Post 4
+    drawQuad(10,80,11.5,80,11.5,105,10,105);
+}
+//platform
+void platform()
+{
+    //pillars
+    glColor3ub(141,141,146);
+    drawQuad(-2.5, -60, -2.5, -97.5, 5, -100, 5, -65);
+    glColor3ub(84,85,89);
+    drawQuad(5, -65, 5, -100, 7.5, -97.5, 7.5, -60);
+    glColor3ub(141,141,146);
+    drawQuad(-75, -20, -75, -70, -65, -75, -65, -25);
+    glColor3ub(84,85,89);
+    drawQuad(-65, -25, -65, -75, -60, -70, -60, -25);
+    //platform
+    glColor3ub(101,108,107);
+    drawQuad(-100, -10, 70, -100, 80, -100, -100, 0);
+    glColor3ub(157,170,179);
+    glBegin(GL_POLYGON);
+    glVertex2f(-100.0f, 0.0f);
+    glVertex2f(80.0f, -100.0f);
+    glVertex2f(100.0f,-100.0f);
+    glVertex2f(100.0f,-100.0f);
+    glVertex2f(100.0f, -55.0f);
+    glVertex2f(-100.0f, 50.0f);
+    glEnd();
+}
+//raillinesfort1
+void railLinesForTrain1(){
+    glColor3ub(0,0,0);
+    drawLines(-100, 20, 100, -90, 200);
+    drawLines(-100, 5, 100, -105, 200);
+
+    drawLines(-100, 5, -90, 15, 10);
+    drawLines(-90, 0, -80, 10, 10);
+    drawLines(-80, -5, -70, 5, 10);
+    drawLines(-70, -10, -60, 0, 10);
+    drawLines(-60, -16, -50, -6, 10);
+    drawLines(-50, -23, -40, -13, 10);
+    drawLines(-40, -28, -30, -18, 10);
+    drawLines(-30, -33, -20, -23, 10);
+    drawLines(-20, -38, -10, -28, 10);
+    drawLines(-10, -43, 0, -33, 10);
+    drawLines( 0, -49, 10, -39, 10);
+    drawLines(10, -54, 20, -44, 10);
+    drawLines(20, -59, 30, -49,10);
+    drawLines(30, -65, 40, -55, 10);
+    drawLines(40, -70, 50, -60, 10);
+    drawLines(50, -76, 60, -66, 10);
+    drawLines(60, -82, 70, -72, 10);
+    drawLines(70, -87, 80, -77, 10);
+    drawLines(80, -93, 90, -83, 10);
+    drawLines(90, -98, 100, -88, 10);
+}
+//railfort2
+void railLinesForTrain2(){
+    glColor3ub(0,0,0);
+    drawLines(-100, 25, 100, -80, 200);
+    drawLines(-100, 40, 100, -65, 200);
+
+    drawLines(-100, 25, -90, 35, 10);
+    drawLines(-90, 20, -80, 30, 10);
+    drawLines(-80, 15, -70, 25, 10);
+    drawLines(-70, 10, -60, 20, 10);
+    drawLines(-60, 5, -50, 15, 10);
+    drawLines(-50, -2, -40, 8, 10);
+    drawLines(-40, -7, -30, 3, 10);
+    drawLines(-30, -12, -20, -2, 10);
+    drawLines(-20, -17, -10, -7, 10);
+    drawLines(-10, -22, 0, -12, 10);
+    drawLines(0, -27, 10, -17, 10);
+    drawLines(10, -32, 20, -22, 10);
+    drawLines(20, -39, 30, -29,10);
+    drawLines(30, -44, 40, -34, 10);
+    drawLines(40, -49, 50, -39, 10);
+    drawLines(50, -54, 60, -44, 10);
+    drawLines(60, -59, 70, -49, 10);
+    drawLines(70, -64, 80, -54, 10);
+    drawLines(80, -69, 90, -59, 10);
+    drawLines(90, -74, 100, -64, 10);
+}
+
+void road(){
+    //background
+    glColor3ub(90,122,62);
+    drawQuad(-100, -100, 100, -100, 100, 100, -100, 100);
+    //road
+    glColor3ub(47,47,47);
+    drawQuad(-72.5, -100, -10, -100, 50, 100, 20, 100);
+    //white lines
+    glColor3ub(255, 255, 255);
+    drawQuad(-39.5, -100, -34.5, -100, -23.5, -65, -27.5, -63);
+    glColor3ub(255, 255, 255);
+    drawQuad(-25.5, -55.5, -21.5, -57, -1.5, 0, -4.5, 1);
+    glColor3ub(255, 255, 255);
+    drawQuad(0.5, 8, -2.5, 9, 17.5, 58, 19, 57);
+    glColor3ub(255, 255, 255);
+    drawQuad(19.5, 65, 21, 64, 34.75, 100, 32.25, 100);
+}
+
+void roadLeftSide(){
+    glColor3ub(47,47,47);
+    drawQuad(-17, 16, -100, 55, -100, 35, -17, 0);
+}
+void Truck1(){
+
+    //upper chasis
+    glColor3ub(195,193,180);
+    drawQuad(28,75,33,70,38,86,33,90);
+    //borders
+    glColor3ub(114,118,119);
+    drawLines(28,75,33,70,2);
+    drawLines(33,70,38,86,2);
+    drawLines(38,86,33,90,2);
+    drawLines(28,75,33,90,2);
+
+
+    glColor3ub(154,154,151);
+    drawQuad(33,70,33,62,38,78,38,86);
+    glColor3ub(114,118,119);
+    drawQuad(28,75,28,72,33,67,33,70);
+    glColor3ub(8,148,213);
+    drawQuad(28,72,27,70,32,65,33,67);
+    //front glass
+    glColor3ub(194,228,237);
+    drawQuad(27,70,27,67,32,62,32,65);
+    //borders
+    glColor3ub(19,74,131);
+    drawLines(27,70,27,67,2);
+    drawLines(27,67,32,62,2);
+    drawLines(32,62,32,65,2);
+    drawLines(27,70,32,65,2);
+
+
+    glColor3ub(6,122,183);
+    drawQuad(27,67,26,64,31,59,32,62);
+    glColor3ub(19,74,131);
+    drawQuad(26,64,26,60,31,55,31,59);
+    drawLines(31,55,38,78,3);
+    //side glass
+    glColor3ub(194,228,237);
+    drawQuad(32,62,33,65,33,67,32,65);
+    //borders
+    glColor3ub(19,74,131);
+    drawLines(32,62,33,65,2);
+    //drawLines(33,65,33,67,1);
+    drawLines(33,67,32,65,2);
+    drawLines(32,62,32,65,2);
+
+
+    glColor3ub(1,95,151);
+    drawQuad(31,55,33,62,33,65,31,59);
+
+    //tyre
+    glColor3ub(0,0,0);
+    drawQuad(32,57,33,59,33,62,32,60);
+
+    glColor3ub(0,0,0);
+    drawQuad(36,71,37,73,37,77,36,74);
+
+}
+
+Car2(){
+     //Yellow Car upper roof
+    glColor3ub(255,255,1);
+    drawQuad(16,35,20,32,23,40,19,43);
+    //front glass
+    glColor3ub(178,255,254);
+    drawQuad(15,30,19,27,20,32,16,35);
+    //front hood
+    glColor3ub(254,254,5);
+    drawQuad(13,24,17,21,19,27,15,30);
+
+    //front hood lower part
+    glColor3ub(107,103,6);
+    drawQuad(13,21,17,18,17,21,13,24);
+    //back Glass
+    glColor3ub(178,255,254);
+    drawQuad(19,43,23,40, 24,41,20,44);
+    //back hood
+    glColor3ub(244,241,15);
+    drawQuad( 20,44,24,41,25,43,21,46);
+    //side panel
+    glColor3ub(100,100,1);
+    drawQuad( 17,18,25,40,25,43,17,21);
+    drawLines(25,43,17,21,3);
+
+    //side window
+    glColor3ub(64,111,147);
+    drawQuad(19,27,24,41,23,40,20,32);
+
+    //tyre
+    glColor3ub(0,0,0);
+    drawQuad(18,21,19,22,19,25,18,23);
+
+    glColor3ub(0,0,0);
+    drawQuad(23,34,24,35,24,38,23,36);
+}
+
+Car1(){
+    // Green Jeep upper chasis
+    glColor3ub(140,223,111);
+    drawQuad(1,-11,6,-14,11,-1,6,2);
+    //front glass
+    glColor3ub(122,179,224);
+    drawQuad(0,-19,5,-22,6,-14,1,-11);
+    //front hood
+    glColor3ub(145,232,117);
+    drawQuad(-2,-27,3,-29,5,-22,0,-19);
+
+    //front lower
+    glColor3ub(109,178,89);
+    drawQuad(-2,-31,3,-33,3,-29,-2,-27);
+
+    //side glass
+     glColor3ub(76,113,142);
+    drawQuad(5,-22,11,-6,11,-1,6,-14);
+
+    //side panel
+    glColor3ub(89,142,70);
+    drawQuad(3,-33,11,-10,11,-6,3,-29);
+    //finishing
+    glColor3ub(89,142,70);
+    drawTriangle(3,-29,11,-6,5,-22);
+
+    //tyre
+    glColor3ub(0,0,0);
+    drawQuad(5,-28,6,-27,6,-24,5,-25);
+
+    glColor3ub(0,0,0);
+    drawQuad(9,-16,10,-14,10,-11,9,-13);
+
+}
+Car3(){
+    //Red car  Upper chasis
+    glColor3ub(237,138,139);
+    drawQuad(-6,35,-2,32,2,41,-2,44);
+    //back glass
+    glColor3ub(122,179,224);
+    drawQuad(-7,30,-3,27,-2,32,-6,35);
+    //back hood
+    glColor3ub(237,138,139);
+    drawQuad(-9,25,-5,22,-3,27,-7,30);
+    //back lower
+    glColor3ub(236,108,109);
+    drawQuad(-9,22,-5,19,-5,22,-9,25);
+
+    //front glass
+    glColor3ub(76,113,142);
+    drawQuad(-2,44,2,41,4,42,0,45);
+    //Front hood
+    glColor3ub(238,140,141);
+    drawQuad(0,45,4,42,6,46,2,49);
+    //side panel
+    glColor3ub(207,88,90);
+    drawQuad(-5,19,6,43,6,46,-5,22);
+    //border
+    drawLines(6,46,-5,22,3);
+
+    //side glass
+    glColor3ub(178,255,254);
+    drawQuad(-3,27,4,42,2,41,-2,32);
+
+    //Tyre
+    glColor3ub(0,0,0);
+    drawQuad(-3,22,-2,23,-2,26,-3,25);
+
+    glColor3ub(0,0,0);
+    drawQuad(2,34,3,35,3,38,2,37);
+
+  }
+
+Car4(){
+
+    //purple car upper roof
+    glColor3ub(206,0,255);
+    drawQuad(9,70,13,67,18,78,14,80);
+
+    //lower back
+     glColor3ub(206,0,255);
+    drawQuad(9,62,13,59,13,67,9,70);
+    //back Glass
+    glColor3ub(122,179,224);
+    drawQuad(9,66,13,63,13,67,9,70);
+    //front glass
+    glColor3ub(167,219,251);
+    drawQuad(18,78,20,79,16,81,14,80);
+    //front hood
+    glColor3ub(206,0,255);
+    drawQuad(20,79,22,83,19,85, 16,81);
+
+    //side panel
+    glColor3ub(109,0,179);
+    drawQuad( 13,59,22,80,22,83,13,63);
+
+    drawLines(22,83,13,63,3);
+    //side glass
+    glColor3ub(76,113,142);
+    drawQuad(13,63,20,79,18,78,13,67);
+
+    //tyre
+    glColor3ub(0,0,0);
+    drawQuad(14,61,15,62,15,65,14,64);
+
+    glColor3ub(0,0,0);
+    drawQuad(20,75,21,76,21,79,20,78);
+
+
+}
+
+void Train1Day(){
+    //top view
+    glColor3ub(19,128,90);
+    drawQuad(-95, 20, 25, -45, 35, -30, -85, 30);
+    //front
+    drawQuad(25, -45, 40, -60, 45, -50, 35, -30);
+    drawQuad(40, -60, 40, -70, 45, -60, 45, -50);
+    //side
+    glColor3ub(225,225,225);
+    drawQuad(-95, 0, 25, -65, 25, -45, -95, 20);
+    drawQuad(25, -45, 25, -65, 40, -70, 40, -60);
+
+    //strips
+    glColor3ub(255, 255, 255);
+    drawLines(-92, 23, 28, -40, 200);
+    drawLines(-88, 27, 31, -35, 200);
+    //red strip
+    glColor3ub(170,0,0);
+    drawLines(-95, 2, 25, -63, 200);
+    drawLines(25, -63,  40, -68, 200);
+
+    // windows and doors
+
+    //windshield
+    glColor3ub(140,217,227);
+    drawQuad(28, -45, 40, -56, 43, -49, 35, -33);
+    //side glass 1
+    glColor3ub(155, 209, 225);
+    drawQuad(-90, 5, -65, -9, -65, 0, -90, 14);
+    //door 1
+    glColor3ub(131,132,127);
+    drawQuad(-62, -2,-62, -18, -57, -21,-57, -5);
+    //side glass 2
+    glColor3ub(140,217,227);
+    drawQuad(-50, -17, -25, -31, -25, -22, -50, -8);
+
+    //door 2
+    glColor3ub(131,132,127);
+    drawQuad(-22, -24,-22, -40, -17, -43,-17, -27);
+
+    //side glass 3
+    glColor3ub(140,217,227);
+    drawQuad(-10, -38, 15, -52, 15, -43, -10, -29);
+
+    //door 3
+    glColor3ub(131,132,127);
+    drawQuad(18, -44.5, 18, -61.5, 23, -64, 23, -47);
+
+    //cabin last
+    glColor3ub(0, 0, 0);
+
+    drawLines(-54, -22, -54, -2, 15);
+
+    drawLines(-54, -2.5, -45, 10, 15);
+
+    //cabin middle
+    glColor3ub(0, 0, 0);
+    drawLines(-14, -24, -14, -44, 15);
+
+    drawLines(-14, -24, -6, -9.5, 15);
+
+    //lights
+    glColor3ub(255, 255, 0);
+    drawQuad(41, -61, 41, -64, 42.5, -62, 42.5, -59);
+    drawQuad(43.5, -58, 43.5, -61, 44, -59, 44, -56);
+
+    // borders
+    glColor3ub(0, 0, 0);
+    drawLines(-95, 20, 25, -45, 5);
+    drawLines(25, -65, 25, -45, 5);
+    drawLines(25, -45, 35, -30, 5);
+    drawLines( 40, -70,  40, -60, 5);
+    drawLines(25, -45,  40, -60, 5);
+    drawLines(40, -60, 45, -50, 5);
+    drawLines(35, -30, -85, 30, 5);
+    drawLines(-95, 20, -85, 30, 5);
+    drawLines(-95, 0, -95, 20, 5);
+    drawLines(-95, 0, 25, -65, 5);
+    drawLines(25, -65, 40, -70, 5);
+    drawLines(40, -70, 45, -60, 5);
+    drawLines(45, -60, 45, -50, 5);
+    drawLines( 45, -50, 35, -30, 5);
+}
+
+void Train2Day(){
+    //top
+    glColor3ub(19,128,90);
+    drawQuad(-50, 15, 70, -45, 80, -30, -40, 25);
+    //back
+    drawQuad(70, -45, 70, -65, 80, -50, 80, -30);
+    //side
+    glColor3ub(225,225,225);
+    drawQuad(-50, -5, 70, -65, 70, -45, -50, 15);
+    drawQuad(-50, 15, -50, -5, -65, 5, -65, 15);
+    //front
+    glColor3ub(19,128,90);
+    drawQuad(-50, 15, -40, 25, -60, 22, -65, 15);
+
+    //strips
+    glColor3ub(255, 255, 255);
+    drawLines(-47, 18, 73, -40, 200);
+    drawLines(-44, 21, 77, -35, 200);
+
+    drawLines(73, -39, 73, -61, 200);
+    drawLines(77, -34, 77, -55, 200);
+
+    glColor3ub(170,0,0);
+    drawLines(-50, -3, 70, -63, 200);
+    drawLines(-50, -3, -65, 7, 200);
+    // cabin
+    glColor3ub(0, 0, 0);
+    drawLines(27, -44, 27, -23, 15);
+    drawLines(27, -23, 35, -9, 15);
+
+    drawLines(-14, -24, -14, -3, 15);
+    drawLines(-14, -3, -6, 10, 11);
+
+    //windows
+    //side glass 1
+    glColor3ub(155, 209, 225);
+    drawQuad(67, -57, 67, -46, 37, -31, 37, -42);
+    //side glass 2
+    drawQuad(25, -36, 25, -25, -4, -11, -4, -22);
+    //side glass 3
+    drawQuad(-16, -16, -16, -5, -40, 7, -40, -4);
+    //back glass
+    glColor3ub(155, 209, 225);
+    drawQuad(71, -47, 71, -59, 79, -48, 79, -36);
+    //front glass
+    drawQuad(-51, 17, -45, 23, -59, 21, -62, 17);
+
+    glColor3ub(131,132,127);
+    //door 1
+    drawQuad(35, -47, 35, -31, 29, -28, 29, -44);
+    //door 2
+    drawQuad(-6, -27, -6, -10, -12, -7, -12, -24);
+    //door 3
+    drawQuad(-48, -6, -48, 11, -42, 8, -42, -9);
+
+    // borders
+    glColor3ub(0, 0, 0);
+    drawLines(-50, -5, 70, -65, 5);
+    drawLines(70, -65, 70, -45, 5);
+    drawLines(70, -45, -50, 15, 5);
+    drawLines( -50, 15, -50, -5, 5);
+
+    drawLines(-50, 15, 70, -45, 5);
+    drawLines(70, -45, 80, -30, 5);
+    drawLines(80, -30, -40, 25, 5);
+    drawLines(-40, 25, -50, 15, 5);
+
+    drawLines(70, -45, 70, -65, 5);
+    drawLines(70, -65, 80, -50, 5);
+    drawLines(80, -50, 80, -30, 5);
+
+    drawLines(-40, 25, -60, 22, 5);
+    drawLines(-60, 22, -65, 15, 5);
+    drawLines(-50, -5, -65, 5, 5);
+    drawLines(-65, 5, -65, 15, 5);
+    drawLines(-50, 15, -65, 15, 5);
+
+}
+
+void Train1Night(){
+    //top
+    glColor3ub(12,94,51);
+    drawQuad(-95, 20, 25, -45, 35, -30, -85, 30);
+    //front
+    drawQuad(25, -45, 40, -60, 45, -50, 35, -30);
+    drawQuad(40, -60, 40, -70, 45, -60, 45, -50);
+    //side
+    glColor3ub(225,225,225);
+    drawQuad(-95, 0, 25, -65, 25, -45, -95, 20);
+    drawQuad(25, -45, 25, -65, 40, -70, 40, -60);
+
+    //strips
+    glColor3ub(255, 255, 255);
+    drawLines(-92, 23, 28, -40, 200);
+    drawLines(-88, 27, 31, -35, 200);
+    //red strip
+    glColor3ub(170,0,0);
+    drawLines(-95, 2, 25, -63, 200);
+    drawLines(25, -63,  40, -68, 200);
+
+    // windows and doors
+
+    //windshield
+    glColor3ub(140,217,227);
+    drawQuad(28, -45, 40, -56, 43, -49, 35, -33);
+    //side glass 1
+    glColor3ub(155, 209, 225);
+    drawQuad(-90, 5, -65, -9, -65, 0, -90, 14);
+    //door 1
+    glColor3ub(131,132,127);
+    drawQuad(-62, -2,-62, -18, -57, -21,-57, -5);
+    //side glass 2
+    glColor3ub(140,217,227);
+    drawQuad(-50, -17, -25, -31, -25, -22, -50, -8);
+
+    //door 2
+    glColor3ub(131,132,127);
+    drawQuad(-22, -24,-22, -40, -17, -43,-17, -27);
+
+    //side glass 3
+    glColor3ub(140,217,227);
+    drawQuad(-10, -38, 15, -52, 15, -43, -10, -29);
+
+    //door 3
+    glColor3ub(131,132,127);
+    drawQuad(18, -44.5, 18, -61.5, 23, -64, 23, -47);
+
+    //cabin last
+    glColor3ub(0, 0, 0);
+
+    drawLines(-54, -22, -54, -2, 15);
+
+    drawLines(-54, -2.5, -45, 10, 15);
+
+    //cabin middle
+    glColor3ub(0, 0, 0);
+    drawLines(-14, -24, -14, -44, 15);
+
+    drawLines(-14, -24, -6, -9.5, 15);
+
+    //lights
+    glColor3ub(255, 255, 0);
+    drawQuad(41, -61, 41, -64, 42.5, -62, 42.5, -59);
+    drawQuad(43.5, -58, 43.5, -61, 44, -59, 44, -56);
+
+    // borders
+    glColor3ub(0, 0, 0);
+    drawLines(-95, 20, 25, -45, 5);
+    drawLines(25, -65, 25, -45, 5);
+    drawLines(25, -45, 35, -30, 5);
+    drawLines( 40, -70,  40, -60, 5);
+    drawLines(25, -45,  40, -60, 5);
+    drawLines(40, -60, 45, -50, 5);
+    drawLines(35, -30, -85, 30, 5);
+    drawLines(-95, 20, -85, 30, 5);
+    drawLines(-95, 0, -95, 20, 5);
+    drawLines(-95, 0, 25, -65, 5);
+    drawLines(25, -65, 40, -70, 5);
+    drawLines(40, -70, 45, -60, 5);
+    drawLines(45, -60, 45, -50, 5);
+    drawLines( 45, -50, 35, -30, 5);
+}
+
+void Train2Night(){
+    //top
+    glColor3ub(12,94,51);
+    drawQuad(-50, 15, 70, -45, 80, -30, -40, 25);
+    //back
+    drawQuad(70, -45, 70, -65, 80, -50, 80, -30);
+    //side
+    glColor3ub(225,225,225);
+    drawQuad(-50, -5, 70, -65, 70, -45, -50, 15);
+    drawQuad(-50, 15, -50, -5, -65, 5, -65, 15);
+    //front
+    glColor3ub(19,128,90);
+    drawQuad(-50, 15, -40, 25, -60, 22, -65, 15);
+
+    //strips
+    glColor3ub(255, 255, 255);
+    drawLines(-47, 18, 73, -40, 200);
+    drawLines(-44, 21, 77, -35, 200);
+
+    drawLines(73, -39, 73, -61, 200);
+    drawLines(77, -34, 77, -55, 200);
+
+    glColor3ub(170,0,0);
+    drawLines(-50, -3, 70, -63, 200);
+    drawLines(-50, -3, -65, 7, 200);
+    // cabin
+    glColor3ub(0, 0, 0);
+    drawLines(27, -44, 27, -23, 15);
+    drawLines(27, -23, 35, -9, 15);
+
+    drawLines(-14, -24, -14, -3, 15);
+    drawLines(-14, -3, -6, 10, 11);
+
+    //windows
+    //side glass 1
+    glColor3ub(155, 209, 225);
+    drawQuad(67, -57, 67, -46, 37, -31, 37, -42);
+    //side glass 2
+    drawQuad(25, -36, 25, -25, -4, -11, -4, -22);
+    //side glass 3
+    drawQuad(-16, -16, -16, -5, -40, 7, -40, -4);
+    //back glass
+    glColor3ub(155, 209, 225);
+    drawQuad(71, -47, 71, -59, 79, -48, 79, -36);
+    //front glass
+    drawQuad(-51, 17, -45, 23, -59, 21, -62, 17);
+
+    glColor3ub(131,132,127);
+    //door 1
+    drawQuad(35, -47, 35, -31, 29, -28, 29, -44);
+    //door 2
+    drawQuad(-6, -27, -6, -10, -12, -7, -12, -24);
+    //door 3
+    drawQuad(-48, -6, -48, 11, -42, 8, -42, -9);
+
+    // borders
+    glColor3ub(0, 0, 0);
+    drawLines(-50, -5, 70, -65, 5);
+    drawLines(70, -65, 70, -45, 5);
+    drawLines(70, -45, -50, 15, 5);
+    drawLines( -50, 15, -50, -5, 5);
+
+    drawLines(-50, 15, 70, -45, 5);
+    drawLines(70, -45, 80, -30, 5);
+    drawLines(80, -30, -40, 25, 5);
+    drawLines(-40, 25, -50, 15, 5);
+
+    drawLines(70, -45, 70, -65, 5);
+    drawLines(70, -65, 80, -50, 5);
+    drawLines(80, -50, 80, -30, 5);
+
+    drawLines(-40, 25, -60, 22, 5);
+    drawLines(-60, 22, -65, 15, 5);
+    drawLines(-50, -5, -65, 5, 5);
+    drawLines(-65, 5, -65, 15, 5);
+    drawLines(-50, 15, -65, 15, 5);
+}
+
+//carAnimation
+void displayRightLane(){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(positionc, positionc1, 0.0f);
+    Truck1();
+    Car1();
+    Car2();
+    glPopMatrix();
+    //glFlush();
+}
+
+void displayLeftLane(){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(positionc2, positionc3, 0.0f);
+    Car3();
+    Car4();
+    glPopMatrix();
+    //glFlush();
+}
+
+//train animation
+void display3Day() {
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(position1, position, 0.0f);
+    Train1Day();
+    glPopMatrix();
+    //glFlush();
+}
+
+void display5Day(){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(-position3, -position2, 0.0f);
+    Train2Day();
+    glPopMatrix();
+    //glFlush();
+}
+
+void display3Night() {
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(position1, position, 0.0f);
+    Train1Night();
+    glPopMatrix();
+    //glFlush();
+}
+
+void display5Night(){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(-position3, -position2, 0.0f);
+    Train2Night();
+    glPopMatrix();
+    //glFlush();
+}
+
+void BackGround_Day(){
+    //background
+    glColor3ub(90,122,62); //90,122,62
+    drawQuad(-100, -100, 100, -100, 100, 100, -100, 100);
+}
+
+void BackGround_Night(){
+    //background
+    glColor3ub(0,51,25);
+    drawQuad(-100, -100, 100, -100, 100, 100, -100, 100);
+}
+//=======================
+
+void road_Day(){
+    //road
+    glColor3ub(104, 104, 104);
+    drawQuad(-72.5, -100, -10, -100, 50, 100, 20, 100);
+    //white lines
+    glColor3ub(255, 255, 255);
+    drawQuad(-39.5, -100, -34.5, -100, -23.5, -65, -27.5, -63);
+    glColor3ub(255, 255, 255);
+    drawQuad(-25.5, -55.5, -21.5, -57, -1.5, 0, -4.5, 1);
+    glColor3ub(255, 255, 255);
+    drawQuad(0.5, 8, -2.5, 9, 17.5, 58, 19, 57);
+    glColor3ub(255, 255, 255);
+    drawQuad(19.5, 65, 21, 64, 34.75, 100, 32.25, 100);
+}
+
+void roadLeftSide_Day(){
+    glColor3ub(104, 104, 104);
+    drawQuad(-17, 16, -100, 55, -100, 35, -17, 0);
+}
+
+//----------------------
+void road_Night(){
+    //road
+    glColor3ub(47,47,47);
+    drawQuad(-72.5, -100, -10, -100, 50, 100, 20, 100);
+    //white lines
+    glColor3ub(255, 255, 255);
+    drawQuad(-39.5, -100, -34.5, -100, -23.5, -65, -27.5, -63);
+    glColor3ub(255, 255, 255);
+    drawQuad(-25.5, -55.5, -21.5, -57, -1.5, 0, -4.5, 1);
+    glColor3ub(255, 255, 255);
+    drawQuad(0.5, 8, -2.5, 9, 17.5, 58, 19, 57);
+    glColor3ub(255, 255, 255);
+    drawQuad(19.5, 65, 21, 64, 34.75, 100, 32.25, 100);
+}
+
+void roadLeftSide_Night(){
+    glColor3ub(47,47,47);
+    drawQuad(-17, 16, -100, 55, -100, 35, -17, 0);
+}
+
+void RunningTrack_Day(){
+glColor3ub(	86, 65, 44);
+drawQuad(5,-100,20,-100, 70,100,60,100);
+//5,-100 , 60,100
+}
+
+void RunningTrack_Night(){
+glColor3ub(63, 42, 20);
+drawQuad(5,-100,20,-100, 70,100,60,100);
+//5,-100 , 60,100
+}
+
+void Pond_Day(){
+glColor3ub(28,163,236);
+drawQuad(100,-50,37,-40,62,50,100,45);
+glColor3ub(0,0,0);
+drawLines(37,-40,62,50,3);//downward fences
+drawLines(35,-42,62,54,3);
+drawLines(33,-44,62,58,3);
+drawLines(31,-46,62,62,3);
+
+
+//37,-40,62,50
+int x=0;
+int y=0;
+for(int i = 0; i<10; i++){
+glColor3ub(8, 29, 49);
+drawLines(62+x,50+y, 62+x, 63+y,5);
+y=y-25;
+x=x-7;
+}
+
+//UpperFence
+//62,50,100,45
+//37,-40,62,50
+x=0;
+y=0;
+for(int i = 0; i<10; i++){
+glColor3ub(8, 29, 49);
+drawLines(62+x,50+y, 62+x, 63+y,5);
+y=y-1;
+x=x+7;
+}
+
+glColor3ub(0,0,0);
+drawLines(62,50,100,45,3);//upward pond fences
+drawLines(62,54,100,49,3);
+drawLines(62,58,100,53,3);
+drawLines(62,62,100,57,3);
+}
+
+void Pond_Night(){
+glColor3ub(0, 11, 59);
+drawQuad(100,-50,37,-40,62,50,100,45);
+glColor3ub(0,0,0);
+drawLines(37,-40,62,50,3);//downward fences
+drawLines(35,-42,62,54,3);
+drawLines(33,-44,62,58,3);
+drawLines(31,-46,62,62,3);
+
+
+//37,-40,62,50
+int x=0;
+int y=0;
+for(int i = 0; i<10; i++){
+glColor3ub(8, 29, 49);
+drawLines(62+x,50+y, 62+x, 63+y,5);
+y=y-25;
+x=x-7;
+}
+
+x=0;
+y=0;
+for(int i = 0; i<10; i++){
+glColor3ub(8, 29, 49);
+drawLines(62+x,50+y, 62+x, 63+y,5);
+y=y-1;
+x=x+7;
+}
+
+glColor3ub(0,0,0);
+drawLines(62,50,100,45,3);//upward pond fences
+drawLines(62,54,100,49,3);
+drawLines(62,58,100,53,3);
+drawLines(62,62,100,57,3);
+}
+
+void duckHouse_Day(){
+
+// base outline
+
+drawLines(70,20,95,15,3);
+drawLines(70,20,63,-5,3);
+drawLines(95,15,90,-10,3);
+drawLines(63,-5,90,-10,3);
+
+// base quad
+glColor3ub(137, 103, 70);
+drawQuad(63,-5,90,-10,95,15,70,20);
+
+// House base
+glColor3ub(104,0,0);
+drawQuad(70,1,85,-2,85,16,70,19);
+glColor3ub(0,104,0);
+drawQuad(85,-2,90,3,90,13,85,16);
+
+//door one
+glColor3ub(0,0,0);
+drawQuad(75,0,80,-1,80,8,75,9);
+drawQuad(87,0, 89,2, 89, 9, 87,8);
+}
+
+void duckHouse_Night(){
+
+// base outline
+
+drawLines(70,20,95,15,3);
+drawLines(70,20,63,-5,3);
+drawLines(95,15,90,-10,3);
+drawLines(63,-5,90,-10,3);
+
+// base quad
+glColor3ub(45, 25, 4);
+drawQuad(63,-5,90,-10,95,15,70,20);
+
+// House base
+glColor3ub(104,0,0);
+drawQuad(70,1,85,-2,85,16,70,19);
+glColor3ub(0,104,0);
+drawQuad(85,-2,90,3,90,13,85,16);
+
+//door one
+glColor3ub(0,0,0);
+drawQuad(75,0,80,-1,80,8,75,9);
+drawQuad(87,0, 89,2, 89, 9, 87,8);
+}
+
+
+void tree_Day(){
+        int x = 5;
+        for(int i=0; i<8;i++){
+            if(i%2==0){
+                glColor3ub(42,85,60);
+                drawTriangle(75+i,70,73+i,64+x,77+i,64);
+            }else{
+                glColor3ub(	21, 142, 21);
+                drawTriangle(75+i,70,73+i,64+x,77+i,64);
+            }
+
+    }
+       for(int i=0; i<6;i++){
+            if(i%2==0){
+                glColor3ub(42,85,60);
+                drawTriangle(76+i,72,74+i,66+x,78+i,66);
+            }else{
+                glColor3ub(	21, 142, 21);
+                drawTriangle(76+i,72,74+i,66+x,78+i,66);
+            }
+
+    }
+
+
+        for(int i=0; i<4;i++){
+            if(i%2==0){
+                glColor3ub(42,85,60);
+                drawTriangle(77+i,74,75+i,68+x,79+i,68);
+            }else{
+                glColor3ub(	21, 142, 21);
+                drawTriangle(77+i,74,75+i,68+x,79+i,68);
+            }
+
+    }
+
+    glColor3ub(42,85,60);
+                drawTriangle(78,76,76,70+x,80,70);
+glColor3ub(68,48,34);
+    drawLines(78,64,78,55,9);
+}
+
+void tree_Night(){
+        int x = 5;
+        for(int i=0; i<8;i++){
+            if(i%2==0){
+                glColor3ub(9, 64, 6);
+                drawTriangle(75+i,70,73+i,64+x,77+i,64);
+            }else{
+                glColor3ub(	2, 17, 2);
+                drawTriangle(75+i,70,73+i,64+x,77+i,64);
+            }
+
+    }
+       for(int i=0; i<6;i++){
+            if(i%2==0){
+                glColor3ub(9, 64, 6);
+                drawTriangle(76+i,72,74+i,66+x,78+i,66);
+            }else{
+                glColor3ub(	2, 17, 2);
+                drawTriangle(76+i,72,74+i,66+x,78+i,66);
+            }
+
+    }
+
+
+        for(int i=0; i<4;i++){
+            if(i%2==0){
+                glColor3ub(9, 64, 6);
+                drawTriangle(77+i,74,75+i,68+x,79+i,68);
+            }else{
+                glColor3ub(	2, 17, 2);
+                drawTriangle(77+i,74,75+i,68+x,79+i,68);
+            }
+
+    }
+
+    glColor3ub(	2, 17, 2);
+                drawTriangle(78,76,76,70+x,80,70);
+glColor3ub(68,48,34);
+    drawLines(78,64,78,55,9);
+}
+
+
+
+
+
+void forest_Day(){
+
+int x = -10;
+int y = -5;
+int z = 12;
+      for(int i = 0; i<z; i+=5){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 30+y, 0.0f);
+    //glRotatef(-20,1,0,1);
+    tree_Day();
+    glEnd();
+  //  glFlush();
+    glPopMatrix();
+}
+    for(int i = 0; i<z; i+=5){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 20+y, 0.0f);
+    tree_Day();
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+}
+for(int i = 0; i<z; i+=5){
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 10+y, 0.0f);
+    tree_Day();
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+}
+
+for(int i = 0; i<z; i+=5){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 0+y, 0.0f);
+    tree_Day();
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+}
+
+}
+
+void forest_Night(){
+
+int x = -10;
+int y = -5;
+int z = 12;
+      for(int i = 0; i<z; i+=5){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 30+y, 0.0f);
+    //glRotatef(-20,1,0,1);
+    tree_Night();
+    glEnd();
+  //  glFlush();
+    glPopMatrix();
+}
+    for(int i = 0; i<z; i+=5){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 20+y, 0.0f);
+    tree_Night();
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+}
+for(int i = 0; i<z; i+=5){
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 10+y, 0.0f);
+    tree_Night();
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+}
+
+for(int i = 0; i<z; i+=5){
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(x+i, 0+y, 0.0f);
+    tree_Night();
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+}
+
+}
+
+
+
+void teaStall(){
+int y = -3;
+glColor3ub(	4, 26, 82);
+drawQuad(91,88,100,88,100,95+y,94,95+y);//roof
+glColor3ub(3, 18, 58);
+drawQuad(94,95+y,100,95+y,100,97+y,95,97+y);//roof-3D
+glColor3ub(90, 49, 7);
+drawQuad(94,80,100,80,100,87+y,96,87+y);//base -table
+glColor3ub(	34, 2, 10);
+drawQuad(94,80,100,80,100,70-y,94,70-y);//base
+
+glColor3ub(0,0,0);
+drawLines(93,88,93,70,2);//stand
+int x =50 ;
+y=-5;
+drawLines(42+x,65+y,45+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(43+x,65+y,46+x,74+y,4);
+glColor3ub(	90, 38, 14);
+drawLines(44+x,65+y,47+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(45+x,65+y,48+x,74+y,4);
+drawLines(42+x,65+y,42+x,56+y,4);
+drawLines(48+x,74+y,48+x,65+y,4);
+drawLines(45+x,65+y,45+x,56+y,4);
+
+x =40 ;
+y=-5;
+drawLines(42+x,65+y,45+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(43+x,65+y,46+x,74+y,4);
+glColor3ub(	90, 38, 14);
+drawLines(44+x,65+y,47+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(45+x,65+y,48+x,74+y,4);
+drawLines(42+x,65+y,42+x,56+y,4);
+drawLines(48+x,74+y,48+x,65+y,4);
+drawLines(45+x,65+y,45+x,56+y,4);
+
+x =43 ;
+y=15;
+drawLines(42+x,65+y,45+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(43+x,65+y,46+x,74+y,4);
+glColor3ub(	90, 38, 14);
+drawLines(44+x,65+y,47+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(45+x,65+y,48+x,74+y,4);
+drawLines(42+x,65+y,42+x,56+y,4);
+drawLines(48+x,74+y,48+x,65+y,4);
+drawLines(45+x,65+y,45+x,56+y,4);
+//drawQuad();
+
+
+//drawQuad();
+//drawQuad()
+
+
+
+}
+//=======================
+DuckM_Night(){
+    int x = 18;
+    glColor3ub(181,153,47);//Night 181, 153, 47
+    //------
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(_moveDucks, 5.0f, 0.0f);
+    drawQuad(70,20+x,72,20+x,72,23+x,70,23+x);//head
+    drawQuad(69.8,20+x,75,20+x,75,16+x,69.8,16+x);//body
+    drawTriangle(69,21.5+x,70,20.5+x,70,22.5+x);//beak
+    //outline
+    glColor3ub(0,0,0);
+    glLineWidth(1.5);
+    glBegin(GL_LINES);
+	glVertex2f(70,20+x);    // x, y
+	glVertex2f(72,20+x);    // x, y
+
+    glBegin(GL_LINES);
+	glVertex2f(72,23+x);    // x, y
+	glVertex2f(70,23+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75,20+x);    // x, y
+	glVertex2f(69,20+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75,16+x);    // x, y
+	glVertex2f(69,16+x);    // x, y
+
+	glBegin(GL_LINES);//beak
+	glVertex2f(69,21.5+x);    // x, y
+	glVertex2f(70,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//beak
+	glVertex2f(69,21.5+x);    // x, y
+	glVertex2f(70,22.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(70,22.5+x);    // x, y
+	glVertex2f(70,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(75,20+x);    // x, y
+	glVertex2f(75,16+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(69,20+x);    // x, y
+	glVertex2f(69,16+x);    // x, y
+
+	glBegin(GL_LINES);//
+	glVertex2f(72,20+x);    // x, y
+	glVertex2f(72,23+x);    // x, y
+
+
+   glEnd();
+glPopMatrix();
+glutSwapBuffers();
+
+}
+Duckc_Night(int y){
+int x = 18;
+glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glScalef(0.5f, 0.5f, 1.0f);
+    glTranslatef(80,35,0);
+
+    glColor3ub(181, 153, 47);
+    glTranslatef(_moveDucks, 0.0f, 0.0f);
+    drawQuad(70+y,20+x,72+y,20+x,72+y,23+x,70+y,23+x);//head
+    drawQuad(69.8+y,20+x,75+y,20+x,75+y,16+x,69.8+y,16+x);//body
+    drawTriangle(69+y,21.5+x,70+y,20.5+x,70+y,22.5+x);//beak
+
+
+
+    glColor3ub(0,0,0);
+    glLineWidth(1.5);
+    glBegin(GL_LINES);
+	glVertex2f(70+y,20+x);    // x, y
+	glVertex2f(72+y,20+x);    // x, y
+
+    glBegin(GL_LINES);
+	glVertex2f(72+y,23+x);    // x, y
+	glVertex2f(70+y,23+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75+y,20+x);    // x, y
+	glVertex2f(69+y,20+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75+y,16+x);    // x, y
+	glVertex2f(69+y,16+x);    // x, y
+
+	glBegin(GL_LINES);//beak
+	glVertex2f(69+y,21.5+x);    // x, y
+	glVertex2f(70+y,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//beak
+	glVertex2f(69+y,21.5+x);    // x, y
+	glVertex2f(70+y,22.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(70+y,22.5+x);    // x, y
+	glVertex2f(70+y,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(75+y,20+x);    // x, y
+	glVertex2f(75+y,16+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(69+y,20+x);    // x, y
+	glVertex2f(69+y,16+x);    // x, y
+
+	glBegin(GL_LINES);//
+	glVertex2f(72+y,20+x);    // x, y
+	glVertex2f(72+y,23+x);    // x, y
+
+
+
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+
+
+}
+void DuckFamily1_Night(){
+
+DuckM_Night();
+Duckc_Night(8);
+Duckc_Night(16);
+Duckc_Night(24);
+Duckc_Night(32);
+Duckc_Night(40);
+Duckc_Night(48);
+
+}
+
+void DuckFamily2_Night(){
+glMatrixMode(GL_MODELVIEW);
+glPushMatrix();
+glScalef(-1, 1, 1);
+glTranslatef(-160,-70,0);
+DuckM_Night();
+Duckc_Night(8);
+Duckc_Night(16);
+Duckc_Night(24);
+Duckc_Night(32);
+Duckc_Night(40);
+Duckc_Night(48);
+glEnd();
+//glFlush();
+glPopMatrix();
+
+}
+
+
+
+//=======================
+DuckM_Day(){
+    int x = 18;
+    glColor3ub(255,247,0);//Night 181, 153, 47
+    //------
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glTranslatef(_moveDucks, 5.0f, 0.0f);
+    drawQuad(70,20+x,72,20+x,72,23+x,70,23+x);//head
+    drawQuad(69.8,20+x,75,20+x,75,16+x,69.8,16+x);//body
+    drawTriangle(69,21.5+x,70,20.5+x,70,22.5+x);//beak
+    //outline
+    glColor3ub(0,0,0);
+    glLineWidth(1.5);
+    glBegin(GL_LINES);
+	glVertex2f(70,20+x);    // x, y
+	glVertex2f(72,20+x);    // x, y
+
+    glBegin(GL_LINES);
+	glVertex2f(72,23+x);    // x, y
+	glVertex2f(70,23+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75,20+x);    // x, y
+	glVertex2f(69,20+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75,16+x);    // x, y
+	glVertex2f(69,16+x);    // x, y
+
+	glBegin(GL_LINES);//beak
+	glVertex2f(69,21.5+x);    // x, y
+	glVertex2f(70,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//beak
+	glVertex2f(69,21.5+x);    // x, y
+	glVertex2f(70,22.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(70,22.5+x);    // x, y
+	glVertex2f(70,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(75,20+x);    // x, y
+	glVertex2f(75,16+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(69,20+x);    // x, y
+	glVertex2f(69,16+x);    // x, y
+
+	glBegin(GL_LINES);//
+	glVertex2f(72,20+x);    // x, y
+	glVertex2f(72,23+x);    // x, y
+
+
+   glEnd();
+glPopMatrix();
+glutSwapBuffers();
+
+}
+Duckc_Day(int y){
+int x = 18;
+glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glScalef(0.5f, 0.5f, 1.0f);
+    glTranslatef(80,35,0);
+
+    glColor3ub(255,247,0);
+    glTranslatef(_moveDucks, 0.0f, 0.0f);
+    drawQuad(70+y,20+x,72+y,20+x,72+y,23+x,70+y,23+x);//head
+    drawQuad(69.8+y,20+x,75+y,20+x,75+y,16+x,69.8+y,16+x);//body
+    drawTriangle(69+y,21.5+x,70+y,20.5+x,70+y,22.5+x);//beak
+
+
+
+    glColor3ub(0,0,0);
+    glLineWidth(1.5);
+    glBegin(GL_LINES);
+	glVertex2f(70+y,20+x);    // x, y
+	glVertex2f(72+y,20+x);    // x, y
+
+    glBegin(GL_LINES);
+	glVertex2f(72+y,23+x);    // x, y
+	glVertex2f(70+y,23+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75+y,20+x);    // x, y
+	glVertex2f(69+y,20+x);    // x, y
+
+
+    glBegin(GL_LINES);
+	glVertex2f(75+y,16+x);    // x, y
+	glVertex2f(69+y,16+x);    // x, y
+
+	glBegin(GL_LINES);//beak
+	glVertex2f(69+y,21.5+x);    // x, y
+	glVertex2f(70+y,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//beak
+	glVertex2f(69+y,21.5+x);    // x, y
+	glVertex2f(70+y,22.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(70+y,22.5+x);    // x, y
+	glVertex2f(70+y,20.5+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(75+y,20+x);    // x, y
+	glVertex2f(75+y,16+x);    // x, y
+
+    glBegin(GL_LINES);//
+	glVertex2f(69+y,20+x);    // x, y
+	glVertex2f(69+y,16+x);    // x, y
+
+	glBegin(GL_LINES);//
+	glVertex2f(72+y,20+x);    // x, y
+	glVertex2f(72+y,23+x);    // x, y
+
+
+
+    glEnd();
+    //glFlush();
+    glPopMatrix();
+
+
+}
+void DuckFamily1_Day(){
+
+DuckM_Day();
+Duckc_Day(8);
+Duckc_Day(16);
+Duckc_Day(24);
+Duckc_Day(32);
+Duckc_Day(40);
+Duckc_Day(48);
+
+}
+
+void DuckFamily2_Day(){
+glMatrixMode(GL_MODELVIEW);
+glPushMatrix();
+glScalef(-1, 1, 1);
+glTranslatef(-160,-70,0);
+DuckM_Day();
+Duckc_Day(8);
+Duckc_Day(16);
+Duckc_Day(24);
+Duckc_Day(32);
+Duckc_Day(40);
+Duckc_Day(48);
+glEnd();
+//glFlush();
+glPopMatrix();
+
+}
+
+void GardenLamps_Day(){
+
+//lampStand
+int x=3;
+int y=0.2;
+for(int i = 0; i<10; i++){
+glColor3ub(8, 29, 49);
+drawLines(45+x,79+y,45+x,99+y,9); // lampStand
+glColor3ub(8, 29, 49);
+drawLines(45.9+x,95+y,47+x,95+y,6); // bulb - lamp distance
+glColor3ub(176, 181, 47);
+drawLines(47+x,93+y,47+x,97+y,9); // bulb
+y=y-25;
+x=x-7;
+}
+
+
+
+}
+
+
+
+void GardenLamps_Night(){
+
+//lampStand
+int x=3;
+int y=0.2;
+for(int i = 0; i<10; i++){
+glColor3ub(8, 29, 49);
+drawLines(45+x,79+y,45+x,99+y,9); // lampStand
+glColor3ub(8, 29, 49);
+drawLines(45.9+x,95+y,47+x,95+y,6); // bulb - lamp distance
+glColor3ub(237, 255, 0);
+drawLines(47+x,93+y,47+x,97+y,9); // bulb
+y=y-25;
+x=x-7;
+}
+
+
+
+}
+
+void benches(){
+int x = 0;
+int y = 0;
+for(int i = 0; i<10; i++){
+glColor3ub(	90, 38, 14);
+drawLines(42+x,65+y,45+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(43+x,65+y,46+x,74+y,4);
+glColor3ub(	90, 38, 14);
+drawLines(44+x,65+y,47+x,74+y,4);
+glColor3ub(	24, 10, 4);
+drawLines(45+x,65+y,48+x,74+y,4);
+drawLines(42+x,65+y,42+x,56+y,4);
+drawLines(48+x,74+y,48+x,65+y,4);
+drawLines(45+x,65+y,45+x,56+y,4);
+y=y-25;
+x=x-7;
+}
+}
+
+void display_Night()
+{
+    BackGround_Night();
+    road_Night();
+    roadLeftSide_Night();
+    Btrees();
+    building5();
+    building4();
+    building3();
+    building2();
+    shops();
+    building1();
+    building6();
+    Ray();
+    displayRightLane();
+    displayLeftLane();
+    RunningTrack_Night();
+    forest_Night();
+    Pond_Night();
+    duckHouse_Night();
+    DuckFamily1_Night();
+    DuckFamily2_Night();
+    benches();
+    GardenLamps_Night();
+    platform();
+    LampPost();
+    railLinesForTrain1();
+    railLinesForTrain2();
+    display5Night();
+    display3Night();
+    teaStall();
+    glFlush();
+
+}
+
+void display_Day()
+{
+    BackGround_Day();
+    road_Day();
+    roadLeftSide_Day();
+    displayRightLane();
+    displayLeftLane();
+    Btrees();
+    building5();
+    building4();
+    building3();
+    building2();
+    shops();
+    building1();
+    building6();
+    RunningTrack_Day();
+    forest_Day();
+    Pond_Day();
+    duckHouse_Day();
+    DuckFamily1_Day();
+    DuckFamily2_Day();
+    teaStall();
+    benches();
+    GardenLamps_Day();
+    platform();
+    LampPost();
+    railLinesForTrain1();
+    railLinesForTrain2();
+    display5Day();
+    display3Day();
+    teaStall();
+    glFlush();
+
+}
+
+void handleKeypress(unsigned char key, int x, int y) {
+	switch (key) {
+    case 'd':
+    glutDisplayFunc(display_Day);
+    glutPostRedisplay();
+    break;
+    case 'n':
+    glutDisplayFunc(display_Night);
+    glutPostRedisplay();
+    break;
+    case'r':
+    rainday = true;
+        Rain(_rain);
+        glutPostRedisplay();
+    break;
+     case's':
+     rainday = false;
+        Rain(_rain);
+        glutPostRedisplay();
+	}
+}
+
+int main(int argc, char** argv)
+{
+     cout<<" _____________________________________________________________________________________________________________________"<<endl;
+    cout<<endl;
+    cout<<"                                                          Metro Rail "<<endl;
+    cout<<"                                                 1. Press n for night mode"<<endl;
+    cout<<"                                                 2. Press d for day mode"<<endl;
+    cout<<"                                                 3. Press r to start rain"<<endl;
+    cout<<"                                                 4. Press s to stop rain"<<endl;
+        cout<<" _____________________________________________________________________________________________________________________"<<endl;
+  glutInit(&argc,argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+   glutInitWindowPosition(0, 0);
+   glutInitWindowSize(1920,1080);
+   glutTimerFunc(100, updateDuck, 0);
+   glutTimerFunc(100, updateCart, 0);
+   glutCreateWindow("Metro");
+    glutDisplayFunc(display_Day);
+   init();
+   glutKeyboardFunc(handleKeypress);
+   glutTimerFunc(20, update, 0);
+   glutTimerFunc(20, update1, 0);
+    glutTimerFunc(20, updateCar, 0);
+   glutTimerFunc(20, updateCar1, 0);
+   glutMainLoop();
+   return 0;
+}
